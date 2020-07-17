@@ -49,7 +49,7 @@ def main() -> None:
             #context.present updates the screen with what we've given it
             context.present(root_console)
 
-            
+            root_console.clear()
 
             #capture user input
             for event in tcod.event.wait():
