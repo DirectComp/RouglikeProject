@@ -24,13 +24,13 @@ class EventHandler(tcod.event.EventDispatch[Action]):
 
         #possible keys pressed
         if key == tcod.event.K_UP:
-            action == MovementAction(dx=0, dy=-1)
+            action = MovementAction(dx=0, dy=-1)
         elif key == tcod.event.K_DOWN:
-            action == MovementAction(dx=0, dy=1)
+            action = MovementAction(dx=0, dy=1)
         elif key == tcod.event.K_LEFT:
-            action == MovementAction(dx=-1, dy=0)
+            action = MovementAction(dx=-1, dy=0)
         elif key == tcod.event.K_RIGHT:
-            action == MovementAction(dx=1, dy=0)
+            action = MovementAction(dx=1, dy=0)
 
         #used to escape the game
         elif key == tcod.event.K_ESCAPE:
