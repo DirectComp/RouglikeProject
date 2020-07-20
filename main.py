@@ -1,13 +1,23 @@
+
+"""
+This file is responsible for:
+-Setting up the initial variables, like screen size and the tileset
+-Creating the entities
+-Drawing the screen and everything on it
+-Reacting to the player's input
+"""
+
 #!/user/bin/env python3
 import sys
 import os
 os.environ["path"] = os.path.dirname(sys.executable) + ";" + os.environ["path"]
 import glob
-
 import tcod
 
 #call the functions we wrote
-from actions import EscapeAction, MovementAction
+from engine import Engine
+from entity import Entity
+from game_map import GameMap
 from input_handlers import EventHandler
 
 
@@ -15,9 +25,9 @@ def main() -> None:
     #defining the variables of the screen
     screen_width = 80
     screen_height = 50
-    
-    player_x = int(screen_width / 2)
-    player_y = int(screen_height / 2)
+
+    map_width = 80
+    map_height = 45
 
     tileset = tcod.tileset.load_tilesheet(
         #here we tell tcod what font to use
@@ -27,6 +37,13 @@ def main() -> None:
     #event_handler is an instance of an EventHandler class.
     #we use it to receive events and process them
     event_handler = EventHandler()
+
+    player = Entity(int(screen_width / 2), int(screen_height / 2), "@", (255, 255, 255))
+    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), "@", (255, 255, 0))
+    entities = {npc, player}
+
+    game_map = GameMap(map_width, map_height)
+    engine = Engine(entities=entities, event_handler=event_handler, game_map=game_map, player=player)
 
     #this part creates the screen
     with tcod.context.new_terminal(
@@ -43,36 +60,11 @@ def main() -> None:
         #this is our game loop
         while True:
             #this line tells the program to put the '@' on the screen in the proper place
-            root_console.print(x=player_x, y=player_y, string="@")
+            engine.render(console=root_console, context=context)
 
-            #this line puts the info onto the screen
-            #context.present updates the screen with what we've given it
-            context.present(root_console)
+            events = tcod.event.wait()
 
-            root_console.clear()
-
-            #capture user input
-            for event in tcod.event.wait():
-                
-                #We send event to event_handler's "dispatch" method which sends it to the proper place
-                #The Action returned will be assigned to action
-                action = event_handler.dispatch(event)
-                
-                #if we receive no action we skip the rest of the loop
-                if action is None:
-                    continue
-                
-                #if action is an instance of the class MovementAction we move our '@' symbol
-                #We grab the dx and dy values we gave earlier
-                #Add dx and dy to player_x and player_y
-                #Console is using player_x and player_y so this causes the symbol to move
-                if isinstance(action, MovementAction):
-                    player_x += action.dx
-                    player_y += action.dy
-
-                #how to exit the program if Esc key is pressed
-                elif isinstance(action, EscapeAction):
-                    raise SystemExit()
+            engine.handle_events(events)
 
 if __name__ == "__main__":
     main()
